@@ -1,201 +1,33 @@
-# 📘 FULL PROJECT GUIDE
+# 📘 TaskFlow – Multi-Tenant Task Management System
 
-## Multi-Tenant Task & Project Management System
-
-Bu hujjat loyihani **0 dan oxirigacha qanday qilish kerakligini** tushuntiradi.
-O‘qib bo‘lgach, sen:
-
-* backend logikani
-* database structure’ni
-* UI rollarini
-* frontend/backend fayllarni
-
-aniq tasavvur qila olasan.
+**Loyiha turi:** Full-stack (Frontend + Backend)
+**Texnologiyalar:** FastAPI, PostgreSQL, JavaScript (Frontend), HTML/CSS, Tailwind/Custom CSS
+**Maqsad:** Professional task management tizimi, multi-tenant, role-based.
 
 ---
 
-# 1️⃣ USER ROLES & UI LOGIC (ENG MUHIM)
+## 1️⃣ LOYIHANING MAQSADI
 
-Tizimda **3 ta role** bor:
+TaskFlow – bu **multi-tenant task management tizimi** bo‘lib, u tashkilotlar, foydalanuvchilar va ularning loyihalari/taqsimlangan vazifalarini boshqarish imkonini beradi.
 
-* **Owner**
-* **Admin**
-* **Member**
-
-UI **role’ga qarab o‘zgaradi**. Bitta UI emas.
+Frontend zamonaviy UI bilan ta’minlangan: **dark/light mode**, **gold/orange/black ranglar**, **responsive design**.
+Backend esa **role-based permission** va **token-based authentication** orqali xavfsizlikni ta’minlaydi.
 
 ---
 
-## 🟣 OWNER UI
+## 2️⃣ FOYDALANUVCHI ROLES
 
-### Owner kim?
+| Role       | Kirish huquqlari                       | Nima qilishi mumkin                                                                                 |
+| ---------- | -------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| **Owner**  | To‘liq organization access             | Users qo‘shish/o‘zgartirish, Projects va Tasks yaratish/o‘chirish, Organization settings, Analytics |
+| **Admin**  | Organization ichidagi Projects & Tasks | Project yaratish/edit, Task assign/update, Members tasklarini ko‘rish                               |
+| **Member** | Faqat o‘z tasklari                     | Task status update, Deadline ko‘rish                                                                |
 
-* Organization’ni yaratgan user
-* Eng yuqori huquq
-
-### Owner ko‘radigan sahifalar:
-
-* Dashboard
-* Organizations settings
-* Users management
-* Projects
-* Tasks
-* Analytics (oddiy)
-
-### Owner NIMA QILA OLADI?
-
-✅ Organization yaratish / o‘chirish
-✅ User qo‘shish (invite)
-✅ User role o‘zgartirish
-✅ Project yaratish / o‘chirish
-✅ Task yaratish / o‘chirish
-✅ Hamma task’larni ko‘rish
-✅ Admin’larni tayinlash
-
-📌 **UI elementlar:**
-
-* “Add user” tugmasi
-* Role dropdown
-* Organization settings panel
+> **Muhim:** UI tugmalari faqat vizual, backend har doim role tekshiradi.
 
 ---
 
-## 🔵 ADMIN UI
-
-### Admin kim?
-
-* Organization ichida project boshqaruvchi
-
-### Admin ko‘radigan sahifalar:
-
-* Dashboard
-* Projects
-* Tasks
-
-❌ Organization settings YO‘Q
-❌ User role o‘zgartirish YO‘Q
-
-### Admin NIMA QILA OLADI?
-
-✅ Project yaratish / edit
-✅ Task yaratish
-✅ Task assign qilish
-✅ Task status o‘zgartirish
-✅ Member’larning task’larini ko‘rish
-
-📌 **UI elementlar:**
-
-* “Create project”
-* “Assign task”
-* Task status select
-
----
-
-## 🟢 MEMBER UI
-
-### Member kim?
-
-* Oddiy user
-
-### Member ko‘radigan sahifalar:
-
-* My Tasks
-* Profile
-
-❌ Project yaratish YO‘Q
-❌ Boshqa user’larni ko‘rish YO‘Q
-
-### Member NIMA QILA OLADI?
-
-✅ Faqat o‘ziga biriktirilgan task’larni ko‘radi
-✅ Task status’ni o‘zgartiradi
-✅ Deadline’ni ko‘radi
-
-📌 **UI elementlar:**
-
-* Task list
-* Status dropdown
-* Deadline badge
-
----
-
-## 🎯 MUHIM QOIDA (INTERVIEW UCHUN)
-
-> UI’da tugma yo‘qligi — yetarli emas.
-> Backend **baribir permission tekshiradi**.
-
----
-
-# 2️⃣ DATABASE TABLE’LAR (JADVAL KO‘RINISHIDA)
-
-## 🧑 USERS TABLE
-
-| Field           | Type     | Description  |
-| --------------- | -------- | ------------ |
-| id              | UUID     | Primary Key  |
-| email           | string   | Unique       |
-| hashed_password | string   | Bcrypt hash  |
-| is_active       | boolean  | User active  |
-| created_at      | datetime | Created time |
-
----
-
-## 🏢 ORGANIZATIONS TABLE
-
-| Field      | Type     | Description       |
-| ---------- | -------- | ----------------- |
-| id         | UUID     | Primary Key       |
-| name       | string   | Organization name |
-| owner_id   | UUID     | FK → users.id     |
-| created_at | datetime | Created time      |
-
----
-
-## 👥 ORGANIZATION_MEMBERS TABLE
-
-| Field           | Type     | Description            |
-| --------------- | -------- | ---------------------- |
-| id              | UUID     | Primary Key            |
-| user_id         | UUID     | FK → users.id          |
-| organization_id | UUID     | FK → organizations.id  |
-| role            | enum     | owner / admin / member |
-| joined_at       | datetime | Join date              |
-
-📌 **Bu table — multi-tenant yuragi**
-
----
-
-## 📁 PROJECTS TABLE
-
-| Field           | Type     | Description           |
-| --------------- | -------- | --------------------- |
-| id              | UUID     | Primary Key           |
-| name            | string   | Project name          |
-| organization_id | UUID     | FK → organizations.id |
-| created_by      | UUID     | FK → users.id         |
-| is_deleted      | boolean  | Soft delete           |
-| created_at      | datetime | Created time          |
-
----
-
-## ✅ TASKS TABLE
-
-| Field       | Type     | Description               |
-| ----------- | -------- | ------------------------- |
-| id          | UUID     | Primary Key               |
-| title       | string   | Task title                |
-| description | text     | Task details              |
-| status      | enum     | todo / in_progress / done |
-| priority    | enum     | low / medium / high       |
-| deadline    | datetime | Deadline                  |
-| project_id  | UUID     | FK → projects.id          |
-| assigned_to | UUID     | FK → users.id             |
-| is_deleted  | boolean  | Soft delete               |
-| created_at  | datetime | Created time              |
-
----
-
-# 3️⃣ UMUMIY FILE STRUCTURE (BACKEND + FRONTEND)
+## 3️⃣ UMUMIY FILE STRUKTURASI
 
 ```
 project-root/
@@ -203,63 +35,257 @@ project-root/
 ├── backend/
 │   └── app/
 │       ├── api/
-│       │   ├── auth/
-│       │   ├── users/
-│       │   ├── organizations/
-│       │   ├── projects/
-│       │   └── tasks/
+│       │   ├── auth/                # Login/Register endpoints
+│       │   │   ├── routes.py
+│       │   │   └── schemas.py
+│       │   ├── users/               # User CRUD
+│       │   │   ├── routes.py
+│       │   │   └── schemas.py
+│       │   ├── organizations/       # Organization CRUD + members
+│       │   │   ├── routes.py
+│       │   │   └── schemas.py
+│       │   ├── projects/            # Project CRUD
+│       │   │   ├── routes.py
+│       │   │   └── schemas.py
+│       │   └── tasks/               # Task CRUD
+│       │       ├── routes.py
+│       │       └── schemas.py
 │       │
 │       ├── core/
-│       │   ├── config.py
-│       │   ├── security.py
-│       │   └── dependencies.py
+│       │   ├── config.py            # App configuration
+│       │   ├── security.py          # JWT, hashing
+│       │   └── dependencies.py      # DB/session dependencies
 │       │
-│       ├── models/
-│       ├── schemas/
-│       ├── services/
-│       ├── repositories/
-│       ├── db/
-│       ├── tests/
-│       └── main.py
+│       ├── models/                  # SQLAlchemy models
+│       │   ├── user.py
+│       │   ├── organization.py
+│       │   ├── organization_member.py
+│       │   ├── project.py
+│       │   └── task.py
+│       │
+│       ├── repositories/            # DB queries abstraction
+│       ├── services/                # Business logic
+│       ├── db/                      # DB connection/session
+│       ├── tests/                   # Unit / integration tests
+│       └── main.py                  # FastAPI entry point
 │
 ├── frontend/
-│   ├── index.html          # login
-│   ├── dashboard.html     # owner/admin
-│   ├── my-tasks.html      # member
-│   │
+│   ├── index.html                    # Login/Register
+│   ├── dashboard.html                # Owner/Admin
+│   ├── my-tasks.html                 # Member
 │   ├── css/
-│   │   └── style.css
-│   │
+│   │   └── style.css                 # Dark/Light mode, colors, layout
 │   └── js/
-│       ├── auth.js        # login, token
-│       ├── api.js         # fetch wrapper
-│       ├── owner.js       # owner UI logic
-│       ├── admin.js       # admin UI logic
-│       └── member.js      # member UI logic
+│       ├── auth.js                   # Login/Register, token handling
+│       ├── api.js                    # API fetch wrapper
+│       ├── owner.js                  # Owner UI logic
+│       ├── admin.js                  # Admin UI logic
+│       └── member.js                 # Member UI logic
 │
 ├── docker-compose.yml
-├── .env
+├── .env                              # Env variables (DB, JWT secret)
 └── README.md
+```
+
+> Bu struktura backend + frontendni bir joyda professional tarzda ko‘rsatadi.
+
+---
+
+## 4️⃣ POSTGRESQL TABLES
+
+### 🧑 USERS TABLE
+
+| Field           | Type      | Description           |
+| --------------- | --------- | --------------------- |
+| id              | UUID      | Primary Key           |
+| email           | VARCHAR   | Unique                |
+| hashed_password | TEXT      | Bcrypt hash           |
+| is_active       | BOOLEAN   | User active flag      |
+| created_at      | TIMESTAMP | Account creation date |
+
+---
+
+### 🏢 ORGANIZATIONS TABLE
+
+| Field      | Type      | Description                |
+| ---------- | --------- | -------------------------- |
+| id         | UUID      | Primary Key                |
+| name       | VARCHAR   | Organization name          |
+| owner_id   | UUID      | FK → users.id              |
+| created_at | TIMESTAMP | Organization creation date |
+
+---
+
+### 👥 ORGANIZATION_MEMBERS TABLE
+
+| Field                            | Type      | Description                  |
+| -------------------------------- | --------- | ---------------------------- |
+| id                               | UUID      | Primary Key                  |
+| user_id                          | UUID      | FK → users.id                |
+| organization_id                  | UUID      | FK → organizations.id        |
+| role                             | VARCHAR   | owner / admin / member       |
+| joined_at                        | TIMESTAMP | Member join date             |
+| UNIQUE(user_id, organization_id) | -         | Prevent duplicate membership |
+
+> Bu jadval multi-tenant tizimning yuragi hisoblanadi.
+
+---
+
+### 📁 PROJECTS TABLE
+
+| Field           | Type      | Description           |
+| --------------- | --------- | --------------------- |
+| id              | UUID      | Primary Key           |
+| name            | VARCHAR   | Project name          |
+| organization_id | UUID      | FK → organizations.id |
+| created_by      | UUID      | FK → users.id         |
+| is_deleted      | BOOLEAN   | Soft delete flag      |
+| created_at      | TIMESTAMP | Project creation date |
+
+---
+
+### ✅ TASKS TABLE
+
+| Field       | Type      | Description               |
+| ----------- | --------- | ------------------------- |
+| id          | UUID      | Primary Key               |
+| title       | VARCHAR   | Task title                |
+| description | TEXT      | Task details              |
+| status      | VARCHAR   | todo / in_progress / done |
+| priority    | VARCHAR   | low / medium / high       |
+| deadline    | TIMESTAMP | Deadline                  |
+| project_id  | UUID      | FK → projects.id          |
+| assigned_to | UUID      | FK → users.id             |
+| is_deleted  | BOOLEAN   | Soft delete flag          |
+| created_at  | TIMESTAMP | Task creation date        |
+
+---
+
+### 📌 Eslatmalar:
+
+1. **UUID ishlatilishi** barcha primary keylar uchun tavsiya qilinadi.
+2. **Soft delete**: `is_deleted` field foydalanuvchiga ko‘rinmay turib, ma’lumotlarni saqlash imkonini beradi.
+3. **Multi-tenant**: `organization_members` orqali user → organization → role bog‘lanadi.
+
+---
+
+## 5️⃣ FRONTEND ↔ BACKEND INTEGRATION
+
+* Login → JWT token olinadi
+* Token `localStorage`da saqlanadi
+* Har bir API requestda token yuboriladi:
+
+```http
+Authorization: Bearer <token>
+```
+
+* Backend token orqali:
+
+  * `user_id`
+  * `organization_id`
+  * `role`
+    aniqlaydi
+
+* Role-based UI avtomatik frontend orqali boshqariladi:
+
+  * Owner → Dashboard, Projects, Tasks, Users, Settings
+  * Admin → Dashboard, Projects, Tasks
+  * Member → My Tasks
+
+---
+
+## 6️⃣ API ENDPOINTS
+
+### Authentication
+
+* `POST /api/auth/login`
+* `POST /api/auth/register`
+* `GET /api/auth/me`
+
+### Organizations
+
+* `GET /api/organizations`
+* `POST /api/organizations`
+* `GET /api/organizations/{id}/members`
+* `POST /api/organizations/{id}/members` (invite user)
+
+### Projects
+
+* `GET /api/organizations/{id}/projects`
+* `POST /api/organizations/{id}/projects`
+
+### Tasks
+
+* `GET /api/tasks/my-tasks`
+* `PATCH /api/tasks/{id}/status`
+* `PUT /api/tasks/{id}`
+
+---
+
+## 7️⃣ DEVELOPMENT SETUP
+
+### Backend
+
+```bash
+# Virtual env yaratish
+python -m venv venv
+source venv/bin/activate
+
+# Dependencies
+pip install -r requirements.txt
+
+# Database migration
+alembic upgrade head
+
+# Run server
+uvicorn app.main:app --reload
+```
+
+### Frontend
+
+```bash
+# Local server
+python -m http.server 8080
+# yoki Node.js: npx serve
+```
+
+> Backend `http://localhost:8000/api` bilan ishlaydi
+
+---
+
+## 8️⃣ ENV VARIABLES (.env)
+
+```
+DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/taskflow
+SECRET_KEY=<jwt-secret-key>
+ACCESS_TOKEN_EXPIRE_MINUTES=60
 ```
 
 ---
 
-# 4️⃣ FRONTEND ↔ BACKEND QANDAY ISHLAYDI
+## 9️⃣ NEXT STEPS / FUTURE FEATURES
 
-* Login → token olinadi
-* Token `localStorage`
-* API request:
-
-  ```
-  Authorization: Bearer <token>
-  ```
-* Backend token’dan:
-
-  * user_id
-  * organization_id
-  * role
-
-ni aniqlaydi
+* File upload (task attachments)
+* Notifications & reminders
+* Real-time updates (WebSockets)
+* Analytics dashboard enhancements
+* Tests coverage increase
 
 ---
 
+## 🔟 TROUBLESHOOTING
+
+* **API connection error:** Backend ishlayotganini tekshiring, `baseUrl` to‘g‘ri ekanligini tekshiring
+* **Theme not saving:** Browser localStorage yoqilganligini tekshiring
+* **Login redirect issues:** Token `localStorage`da borligini va backend to‘g‘ri response yuborayotganini tekshiring
+
+---
+
+## 💡 TIPS
+
+* **Development:** Browser DevTools’dan foydalaning
+* **Testing:** Turli role’lar bilan test qiling
+* **Performance:** Chrome Lighthouse
+* **Accessibility:** Screen reader bilan tekshirish
+
+---

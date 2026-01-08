@@ -1,31 +1,25 @@
-const role = localStorage.getItem("role");
-
-// Hide user management if not owner
-if (role !== "owner") {
-  document.getElementById("userManagement").style.display = "none";
+async function loadOwnerData() {
+    console.log("Loading Owner Specific Data...");
+    const users = await api("/users"); // Backend endpoint
+    renderUsers(users || []);
 }
 
-// Demo data
-const projects = ["Website Redesign", "Mobile App"];
-const tasks = ["Task 1", "Task 2", "Task 3"];
-const users = ["Alice", "Bob", "Charlie"];
-
-// Render lists
-function renderList(id, items) {
-  const ul = document.getElementById(id);
-  ul.innerHTML = "";
-  items.forEach(item => {
-    const li = document.createElement("li");
-    li.textContent = item;
-    ul.appendChild(li);
-  });
+function renderUsers(users) {
+    const list = document.getElementById("userList");
+    if(!list) return;
+    list.innerHTML = users.map(u => `
+        <tr>
+            <td>${u.full_name}</td>
+            <td><span class="badge">${u.role}</span></td>
+            <td>${u.email}</td>
+            <td><button onclick="deleteUser('${u.id}')">🗑️</button></td>
+        </tr>
+    `).join('');
 }
 
-renderList("projectList", projects);
-renderList("taskList", tasks);
-renderList("userList", users);
-
-// Button actions (demo)
-function createProject() { alert("Create Project clicked"); }
-function createTask() { alert("Create Task clicked"); }
-function addUser() { alert("Add User clicked"); }
+async function deleteUser(id) {
+    if(confirm("Are you sure?")) {
+        await api(`/users/${id}`, "DELETE");
+        loadOwnerData();
+    }
+}
