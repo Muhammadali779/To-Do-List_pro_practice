@@ -34,57 +34,81 @@ project-root/
 │
 ├── backend/
 │   └── app/
-│       ├── api/
-│       │   ├── auth/                # Login/Register endpoints
+│       ├── api/                       # Routes & Schemas
+│       │   ├── auth/                  # Login/Register
 │       │   │   ├── routes.py
 │       │   │   └── schemas.py
-│       │   ├── users/               # User CRUD
+│       │   ├── users/                 # User CRUD
 │       │   │   ├── routes.py
 │       │   │   └── schemas.py
-│       │   ├── organizations/       # Organization CRUD + members
+│       │   ├── organizations/         # Org CRUD + members
 │       │   │   ├── routes.py
 │       │   │   └── schemas.py
-│       │   ├── projects/            # Project CRUD
+│       │   ├── projects/              # Project CRUD
 │       │   │   ├── routes.py
 │       │   │   └── schemas.py
-│       │   └── tasks/               # Task CRUD
+│       │   └── tasks/                 # Task CRUD
 │       │       ├── routes.py
 │       │       └── schemas.py
 │       │
-│       ├── core/
-│       │   ├── config.py            # App configuration
-│       │   ├── security.py          # JWT, hashing
-│       │   └── dependencies.py      # DB/session dependencies
+│       ├── core/                       # Config & Security
+│       │   ├── config.py
+│       │   ├── security.py
+│       │   └── dependencies.py
 │       │
-│       ├── models/                  # SQLAlchemy models
+│       ├── models/                     # SQLAlchemy Models
 │       │   ├── user.py
 │       │   ├── organization.py
 │       │   ├── organization_member.py
 │       │   ├── project.py
 │       │   └── task.py
 │       │
-│       ├── repositories/            # DB queries abstraction
-│       ├── services/                # Business logic
-│       ├── db/                      # DB connection/session
-│       ├── tests/                   # Unit / integration tests
-│       └── main.py                  # FastAPI entry point
+│       ├── repositories/               # DB queries abstraction
+│       │   ├── user_repository.py
+│       │   ├── organization_repository.py
+│       │   ├── project_repository.py
+│       │   └── task_repository.py
+│       │
+│       ├── services/                   # Business logic + role check
+│       │   ├── auth_service.py
+│       │   ├── user_service.py
+│       │   ├── organization_service.py
+│       │   ├── project_service.py
+│       │   └── task_service.py
+│       │
+│       ├── db/                         # DB session & engine
+│       │   ├── base.py
+│       │   ├── session.py
+│       │   ├── engine.py
+│       │   └── init_db.py
+│       │
+│       ├── tests/                      # Unit/Integration tests
+│       │   ├── conftest.py
+│       │   ├── test_auth.py
+│       │   ├── test_user.py
+│       │   ├── test_organization.py
+│       │   ├── test_project.py
+│       │   └── test_task.py
+│       │
+│       └── main.py                     # FastAPI entry point
 │
 ├── frontend/
-│   ├── index.html                    # Login/Register
-│   ├── dashboard.html                # Owner/Admin
-│   ├── my-tasks.html                 # Member
+│   ├── index.html                       # Login/Register
+│   ├── dashboard.html                   # Owner/Admin
+│   ├── my-tasks.html                    # Member
 │   ├── css/
-│   │   └── style.css                 # Dark/Light mode, colors, layout
+│   │   └── style.css                    # Theme, colors, layout
 │   └── js/
-│       ├── auth.js                   # Login/Register, token handling
-│       ├── api.js                    # API fetch wrapper
-│       ├── owner.js                  # Owner UI logic
-│       ├── admin.js                  # Admin UI logic
-│       └── member.js                 # Member UI logic
+│       ├── auth.js                      # Login/Register + token
+│       ├── api.js                       # API wrapper
+│       ├── owner.js                     # Owner UI logic
+│       ├── admin.js                     # Admin UI logic
+│       └── member.js                    # Member UI logic
 │
 ├── docker-compose.yml
-├── .env                              # Env variables (DB, JWT secret)
+├── .env                                 # DB, JWT secret
 └── README.md
+
 ```
 
 > Bu struktura backend + frontendni bir joyda professional tarzda ko‘rsatadi.
